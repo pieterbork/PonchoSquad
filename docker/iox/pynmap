@@ -12,7 +12,6 @@ apikey = config['api']['botkey']
 api = CiscoSparkAPI(access_token=apikey)
 roomName = "Poncho Squad"
 
-roomID=getRoomID(api,roomName)
 roomID = "Y2lzY29zcGFyazovL3VzL1JPT00vMTYwZGM5NjAtMjQ4Ni0xMWU4LTk1ZGItZTk5NmY0ZDIyYzcw"
 api.messages.create(roomID, text="Scan Results:")
 nm = nmap.PortScanner()
