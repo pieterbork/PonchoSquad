@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from flask import Flask, render_template, request, redirect, session, flash
 import json
-from call_examples import investigate_domain,get_vt_report
+from call_examples import investigate_domain,get_vt_report,pull_traffic_from_meraki
 from ciscosparkapi import CiscoSparkAPI
 from configparser import ConfigParser
 app = Flask(__name__)
@@ -14,6 +14,26 @@ roomID = config['spark']['roomId']
 
 botapi = CiscoSparkAPI(access_token=botkey)
 api = CiscoSparkAPI(access_token=apikey)
+
+def cronCheck():
+	domains_list = pull_traffic_from_meraki() for domain in domains_list:
+		domain_is_bad = investigate_domain(domain)
+		vt_1, vt_2 = get_vt_report(domain)
+		print(domain_is_bad, vt_1, vt_2)
+		if domain_is_bad or vt_1 or vt_2:
+			if (len(domain_is_bad) == 0):
+			  domain_is_bad = ["None"]
+			if (len(vt_1) == 0):
+			  vt_1 = ["None"]
+			if (len(vt_2) == 0):
+				vt_2 = ["None"]
+			botapi.messages.create(roomID, markdown="<h1>Bad Domain from Meraki AP</h1> - %s<hr>" % domain.replace(".", "{.}"))
+			botapi.messages.create(roomID, markdown="Umbrella Alerts: " + ", ".join(domain_is_bad))
+			botapi.messages.create(roomID, markdown="VirusTotal Sources Confirmed: " + ", ".join(vt_2))
+			botapi.messages.create(roomID, markdown="From: " + ", ".join(vt_1))
+			botapi.messages.create(roomID, markdown="<hr>")
+
+botapi.messages.create(roomID, markdown="<h1>No Issues Found from Meraki AP")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -30,14 +50,20 @@ def index():
 				domain_is_bad = investigate_domain(domain)
 				vt_1, vt_2 = get_vt_report(domain)
 				print(domain_is_bad, vt_1, vt_2)
-				if domain_is_bad:
-					botapi.messages.create(roomID, markdown="<h1>Bad Domain</h1><hr>")
+				if domain_is_bad or vt_1 or vt_2:
+					if (len(domain_is_bad) == 0):
+						domain_is_bad = ["None"]
+					if (len(vt_1) == 0):
+						vt_1 = ["None"]
+					if (len(vt_2) == 0):
+						vt_2 = ["None"]
+					botapi.messages.create(roomID, markdown="<h1>Bad Domain</h1> - %s<hr>" % domain.replace(".", "{.}"))
 					botapi.messages.create(roomID, markdown="Umbrella Alerts: " + ", ".join(domain_is_bad))
 					botapi.messages.create(roomID, markdown="VirusTotal Sources Confirmed: " + ", ".join(vt_2))
 					botapi.messages.create(roomID, markdown="From: " + ", ".join(vt_1))
 					botapi.messages.create(roomID, markdown="<hr>")
 				else:
-					botapi.messages.create(roomID, markdown="<h1>No Issues Found!</h1><hr>")
+					botapi.messages.create(roomID, markdown="<h1>No Issues Found!</h1> - %s<hr>" % domain)
 			return "Success"
 		else:
 			return "Unauthorized"
