@@ -22,12 +22,13 @@ def investigate_domain(domain):
     resp = get_response(url, headers=spark_headers)
     info = json.loads(resp)
     categories = info[0]['categories']
+    ret_str = "The Umbrella API reports "
     if len(categories) > 0:
-        print("THAT URL IS " + ", ".join(categories))
-        return categories
+        ret_str += ", ".join(categories)
     else:
-        print("That url is clean bruh")
-        return None
+        ret_str += "that url is clean"
+
+    return ret_str
 
 def get_vt_report(domain):
     vt_headers = {
@@ -47,7 +48,9 @@ def get_vt_report(domain):
             results["sources"].add(scan)
             results["types"].add(result)
 #                print("{} Reported this as {}".format(scan, result))
-    return results
+    ret_str = "VirusTotal sources confirmed [{}] from [{}]".format(", ".join(results["types"]),", ".join(results["sources"]))
+    return ret_str
+
 
 
 #investigate_domain('google.com')
@@ -66,9 +69,11 @@ def get_vt_report(domain):
 #value = "wd4o.com"
 #
 #results = get_vt_report(value)
+#print(results)
 #print("MAH RESULTS", results)
 #
 #domain_is_bad = investigate_domain(value)
+#print(domain_is_bad)
 #if domain_is_bad:
 #    #POST TO SPARK ROOM
 #    print("Ohhh boi bad domain")
