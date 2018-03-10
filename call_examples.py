@@ -12,21 +12,27 @@ if not token:
 
 # domains/categorization
 
-headers = {
+spark_headers = {
   'Authorization': 'Bearer ' + token
 }
+vt_headers = {
+    "Accept-Encoding": "gzip, deflate",
+    "User-Agent" : "gzip,  My Python requests library example client or username"
+}
 
-def get_response(url, values=None):
+def get_response(url, values=None, headers=None, params=None):
     print(url)
     if values:
         r = requests.post(url, data=json.dumps(values), headers=headers)
+    elif params:
+        r = requests.post(url, params=params, headers=headers)
     else:
         r = requests.get(url, headers=headers)
     return r.text
 
 def investigate_domain(domain):
     url = 'https://investigate.api.umbrella.com/timeline/{}'.format(domain)
-    resp = get_response(url)
+    resp = get_response(url, headers=spark_headers)
     info = json.loads(resp)
     categories = info[0]['categories']
     if len(categories) > 0:
@@ -35,6 +41,22 @@ def investigate_domain(domain):
     else:
         print("That url is clean bruh")
         return None
+
+def get_vt_report(domain):
+        vtparams = {'apikey': '4837b1adf0d071cd02bd05953d59b3e20ff48bcccea185b37f2bc2a63fcc73d7', 'resource':domain}
+        resp = get_response('https://www.virustotal.com/vtapi/v2/url/report', params=vtparams, headers=vt_headers)
+        info = json.loads(resp)
+        scans = info['scans']
+
+        results = {"sources": set([]), "types": set([])}
+        for scan in scans:
+            detected = scans[scan]['detected']
+            result = scans[scan]['result']
+            if detected:
+                results["sources"].add(scan)
+                results["types"].add(result)
+#                print("{} Reported this as {}".format(scan, result))
+        return results
 
 
 #investigate_domain('google.com')
@@ -51,6 +73,9 @@ values = ["google.com", "yahoo.com"]
 #nasty domains
 value = "fbl.com.sg"
 value = "wd4o.com"
+
+results = get_vt_report(value)
+print("MAH RESULTS", results)
 
 domain_is_bad = investigate_domain(value)
 if domain_is_bad:
