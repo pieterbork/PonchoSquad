@@ -1,4 +1,6 @@
-from ciscosparkapi import CiscoSparkApi
+from ciscosparkapi import CiscoSparkAPI
+import configparser
+import time
 
 # read config file
 config = configparser.ConfigParser()
@@ -18,7 +20,7 @@ def getRoomID(api, roomName):
 
 # send message
 roomID=getRoomID(api,roomName)
-api.messages.create(roomID, text="Hello")
+api.messages.create(roomID, text="test bot")
 
 tempID=[]
 
