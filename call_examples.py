@@ -24,9 +24,12 @@ def investigate_domain(domain):
     url = 'https://investigate.api.umbrella.com/timeline/{}'.format(domain)
     resp = get_response(url, headers=spark_headers)
     categories = []
-    if resp:
-        info = json.loads(resp)
-        categories = info[0]['categories']
+    try:
+        if resp:
+            info = json.loads(resp)
+            categories = info[0]['categories']
+    except:
+        return categories
 
     return categories
 
@@ -50,6 +53,18 @@ def get_vt_report(domain):
                 results["types"].add(result)
     #                print("{} Reported this as {}".format(scan, result))
     return list(results["sources"]), list(results["types"])
+
+def pull_traffic_from_meraki():
+    meraki_headers = {
+            'X-Cisco-Meraki-API-Key': 'f177c3471cec67471f5ba1e792d23dbdad3d9ab3',
+            'Content-Type': 'application/json'
+    }
+    resp = get_response('https://api.meraki.com/api/v0/networks/[0]/traffic?timespan=7200')
+    print(resp)
+
+#pull_traffic_from_meraki()
+
+
 
 
 
