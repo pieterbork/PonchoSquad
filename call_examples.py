@@ -31,4 +31,12 @@ values = ["google.com", "yahoo.com"]
 resp = get_response('https://investigate.api.opendns.com/domains/categorization/', values)
 print(resp)
 
+resp = get_response('https://investigate.api.opendns.com/domains/categories')
+print(resp)
+
+resp = get_response('https://investigate.api.opendns.com/domains/score/example.com')
+print(resp)
+
+resp = get_response('https://investigate.api.opendns.com/domains/score/', values)
+print(resp)
 
