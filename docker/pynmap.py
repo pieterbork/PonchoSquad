@@ -12,8 +12,6 @@ apikey = config['api']['botkey']
 api = CiscoSparkAPI(access_token=apikey)
 roomName = "Poncho Squad"
 
-print(roomName)
-
 def getRoomID(api, roomName):
     rawRooms=api.rooms.list()
     rooms=[room for room in rawRooms if room.title == roomName]
