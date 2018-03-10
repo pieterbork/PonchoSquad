@@ -27,7 +27,15 @@ def get_response(url, values=None):
 def investigate_domain(domain):
     url = 'https://investigate.api.umbrella.com/timeline/{}'.format(domain)
     resp = get_response(url)
-    return json.loads(resp)
+    info = json.loads(resp)
+    categories = info[0]['categories']
+    if len(categories) > 0:
+        print("THAT URL IS " + ", ".join(categories))
+        return categories
+    else:
+        print("That url is clean bruh")
+        return None
+
 
 #investigate_domain('google.com')
 #investigate_domain("www.ncicye.com")
@@ -44,12 +52,10 @@ values = ["google.com", "yahoo.com"]
 value = "fbl.com.sg"
 value = "wd4o.com"
 
-info = investigate_domain(value)
-categories = info[0]['categories']
-if len(categories) > 0:
-    print("THAT URL IS " + ", ".join(categories))
-else:
-    print("That url is clean bruh")
+domain_is_bad = investigate_domain(value)
+if domain_is_bad:
+    #POST TO SPARK ROOM
+    print("Ohhh boi bad domain")
 quit()
 
 resp = get_response('https://investigate.api.opendns.com/domains/categories')
