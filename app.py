@@ -37,7 +37,7 @@ def index():
 					botapi.messages.create(roomID, markdown="From: " + ", ".join(vt_1))
 					botapi.messages.create(roomID, markdown="<hr>")
 				else:
-					bot.api.messages.create(roomID, markdown="<h1>No Issues Found!</h1><hr>")
+					botapi.messages.create(roomID, markdown="<h1>No Issues Found!</h1><hr>")
 			return "Success"
 		else:
 			return "Unauthorized"
