@@ -4,7 +4,7 @@ import json
 import os, sys
 
 token = os.getenv('INVESTIGATE_TOKEN', False)
-token = "3bb69d0a-ccc7-40b5-a386-48632333e381"
+token = "7be254dc-9e39-4d06-b729-3578827b20db"
 
 if not token:
   print("ERROR: environment variable \'INVESTIGATE_TOKEN\' not set. Invoke script with \'INVESTIGATE_TOKEN=%YourToken% python scripts.py\'")
@@ -25,25 +25,32 @@ def get_response(url, values=None):
     return r.text
 
 def investigate_domain(domain):
-    url = 'https://investigate.api.opendns.com/security/name/{}.json'.format(domain)
-    url = 'https://investigate.api.opendns.com/domains/{}/latest_tags'.format(domain)
     url = 'https://investigate.api.umbrella.com/timeline/{}'.format(domain)
-    print(url)
     resp = get_response(url)
-    print("investigate", resp)
+    return json.loads(resp)
 
-
-investigate_domain("www.ncicye.com")
-investigate_domain("www.dreamscreen.xyz")
-investigate_domain("www.internetbadguys.com")
-investigate_domain("www.ciilhk.com")
-
-resp = get_response('https://investigate.api.opendns.com/domains/categorization/amazon.com')
-print(resp)
+#investigate_domain('google.com')
+#investigate_domain("www.ncicye.com")
+#investigate_domain("www.dreamscreen.xyz")
+#investigate_domain("www.internetbadguys.com")
+#investigate_domain("www.ciilhk.com")
+#
+#resp = get_response('https://investigate.api.opendns.com/domains/categorization/amazon.com')
+#print(resp)
 
 values = ["google.com", "yahoo.com"]
-resp = get_response('https://investigate.api.opendns.com/domains/categorization/', values)
-print("domain categorization", resp)
+
+#nasty domains
+value = "fbl.com.sg"
+value = "wd4o.com"
+
+info = investigate_domain(value)
+categories = info[0]['categories']
+if len(categories) > 0:
+    print("THAT URL IS " + ", ".join(categories))
+else:
+    print("That url is clean bruh")
+quit()
 
 resp = get_response('https://investigate.api.opendns.com/domains/categories')
 print("domain categories", resp)
