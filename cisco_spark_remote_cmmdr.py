@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-#get a message from Cisco Spark and run it.
-#to send a message start the line with "oled"
-# There are on average 110 bytes on a failed ssh login. 64+(3*password attempts)
-# There should be on average 150 events per analyst hour in a soc
-# 
+#Joe's example code for sending bash commands from a spark room
 import subprocess
 from ciscosparkapi import CiscoSparkAPI
 
