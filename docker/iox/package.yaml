@@ -1,0 +1,24 @@
+descriptor-schema-version: "2.2"
+
+info:
+  name: iox_docker_sparkbot
+  description: "IOx Docker Cisco Spark Bot"
+  version: "1.0"
+  author-link: "https://github.com/pieterbork/PonchoSquad"
+  author-name: "Josh Anderson"
+
+app:
+  cpuarch: "x86_64"
+  type: docker
+  resources:
+    profile: c1.small
+    network:
+      -
+        interface-name: eth0
+        ports:
+          tcp:
+            - 8000
+
+  startup:
+    rootfs: rootfs.tar
+    target: ["python3 pynmap"]

@@ -5,12 +5,15 @@ import os, sys
 
 def get_response(url, values=None, headers=None, params=None):
     print(url)
-    if values:
-        r = requests.post(url, data=json.dumps(values), headers=headers)
-    elif params:
-        r = requests.post(url, params=params, headers=headers)
-    else:
-        r = requests.get(url, headers=headers)
+    try:
+        if values:
+            r = requests.post(url, data=json.dumps(values), headers=headers)
+        elif params:
+            r = requests.post(url, params=params, headers=headers)
+        else:
+            r = requests.get(url, headers=headers)
+    except:
+        return None
     return r.text
 
 def investigate_domain(domain):
@@ -20,8 +23,13 @@ def investigate_domain(domain):
     }
     url = 'https://investigate.api.umbrella.com/timeline/{}'.format(domain)
     resp = get_response(url, headers=spark_headers)
-    info = json.loads(resp)
-    categories = info[0]['categories']
+    categories = []
+    try:
+        if resp:
+            info = json.loads(resp)
+            categories = info[0]['categories']
+    except:
+        pass
 
     return categories
 
@@ -32,18 +40,43 @@ def get_vt_report(domain):
     }
     vtparams = {'apikey': '4837b1adf0d071cd02bd05953d59b3e20ff48bcccea185b37f2bc2a63fcc73d7', 'resource':domain}
     resp = get_response('https://www.virustotal.com/vtapi/v2/url/report', params=vtparams, headers=vt_headers)
-    info = json.loads(resp)
-    scans = info['scans']
-
     results = {"sources": set([]), "types": set([])}
-    for scan in scans:
-        detected = scans[scan]['detected']
-        result = scans[scan]['result']
-        if detected:
-            results["sources"].add(scan)
-            results["types"].add(result)
-#                print("{} Reported this as {}".format(scan, result))
+    try:
+        if resp:
+            info = json.loads(resp)
+            scans = info['scans']
+
+            for scan in scans:
+                detected = scans[scan]['detected']
+                result = scans[scan]['result']
+                if detected:
+                    results["sources"].add(scan)
+                    results["types"].add(result)
+    except:
+        pass
+
+    #                print("{} Reported this as {}".format(scan, result))
     return list(results["sources"]), list(results["types"])
+
+def pull_traffic_from_meraki():
+    meraki_headers = {
+            'X-Cisco-Meraki-API-Key': 'f177c3471cec67471f5ba1e792d23dbdad3d9ab3',
+            'Content-Type': 'application/json'
+    }
+    resp = get_response('https://api.meraki.com/api/v0/networks/L_600667600300542101/traffic?timespan=7200', headers=meraki_headers)
+    valid_records = set([])
+
+    try:
+        if resp:
+            info = json.loads(resp)
+
+            for record in info:
+                dest = record["destination"]
+                if dest:
+                    valid_records.add(dest)
+    except:
+        pass
+    return list(valid_records)
 
 
 
@@ -67,6 +100,12 @@ def get_vt_report(domain):
 #print("MAH RESULTS", results)
 #
 #domain_is_bad = investigate_domain(value)
+#print(domain_is_bad)
+
+#sources, types = get_vt_report("nakedmolerat.com")
+#print(sources, types)
+
+#domain_is_bad = investigate_domain("nakedmolerat.com")
 #print(domain_is_bad)
 #if domain_is_bad:
 #    #POST TO SPARK ROOM
