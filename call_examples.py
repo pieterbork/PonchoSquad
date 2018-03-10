@@ -29,7 +29,7 @@ def investigate_domain(domain):
             info = json.loads(resp)
             categories = info[0]['categories']
     except:
-        return categories
+        pass
 
     return categories
 
@@ -41,16 +41,20 @@ def get_vt_report(domain):
     vtparams = {'apikey': '4837b1adf0d071cd02bd05953d59b3e20ff48bcccea185b37f2bc2a63fcc73d7', 'resource':domain}
     resp = get_response('https://www.virustotal.com/vtapi/v2/url/report', params=vtparams, headers=vt_headers)
     results = {"sources": set([]), "types": set([])}
-    if resp:
-        info = json.loads(resp)
-        scans = info['scans']
+    try:
+        if resp:
+            info = json.loads(resp)
+            scans = info['scans']
 
-        for scan in scans:
-            detected = scans[scan]['detected']
-            result = scans[scan]['result']
-            if detected:
-                results["sources"].add(scan)
-                results["types"].add(result)
+            for scan in scans:
+                detected = scans[scan]['detected']
+                result = scans[scan]['result']
+                if detected:
+                    results["sources"].add(scan)
+                    results["types"].add(result)
+    except:
+        pass
+
     #                print("{} Reported this as {}".format(scan, result))
     return list(results["sources"]), list(results["types"])
 
@@ -59,12 +63,20 @@ def pull_traffic_from_meraki():
             'X-Cisco-Meraki-API-Key': 'f177c3471cec67471f5ba1e792d23dbdad3d9ab3',
             'Content-Type': 'application/json'
     }
-    resp = get_response('https://api.meraki.com/api/v0/networks/[0]/traffic?timespan=7200')
-    print(resp)
+    resp = get_response('https://api.meraki.com/api/v0/networks/L_600667600300542101/traffic?timespan=7200', headers=meraki_headers)
+    valid_records = set([])
 
-#pull_traffic_from_meraki()
+    try:
+        if resp:
+            info = json.loads(resp)
 
-
+            for record in info:
+                dest = record["destination"]
+                if dest:
+                    valid_records.add(dest)
+    except:
+        pass
+    return list(valid_records)
 
 
 
