@@ -1,0 +1,3 @@
+ciscosparkapi
+python-nmap
+configparser
