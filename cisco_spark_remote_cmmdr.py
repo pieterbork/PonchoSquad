@@ -22,9 +22,11 @@ if args.pid:
 config= configparser.ConfigParser()
 #config.read('/root/spark.cfg')
 #apiKey=config['apiKey']['key']
-apiKey="NmZiNGU3NWYtNWY3My00MzI1LWE5MzUtODFmMmY5MGZmYmU3MWFkODIxMDgtODQ0"
+#apiKey="NmZiNGU3NWYtNWY3My00MzI1LWE5MzUtODFmMmY5MGZmYmU3MWFkODIxMDgtODQ0"
+apiKey="YTM4ZDk2NjAtNTA3Zi00ZTVkLWFjMjgtZjIwNzMxYjZjM2JjNDFhZmIwZDgtNzM4"
+
 api = CiscoSparkAPI(access_token=apiKey)
-roomName="DarkMatter"
+roomName="darkmatter"
 
 def getRoomID(api, roomName):
         rawRooms=api.rooms.list()
